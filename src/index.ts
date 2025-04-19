@@ -5,20 +5,16 @@ import { User } from "./models/user";
 import { Error } from "mongoose";
 
 dotenv.config();
-
 const app: Express = express();
 const port = process.env.PORT || 3001;
 
+// Middleware to parse JSON bodies in the request
+app.use(express.json());
+
 app.post("/user", async (req: Request, res: Response) => {
   try {
-    const user = new User({
-      firstName: "Prakash",
-      lastName: "Kumar",
-      email: "maiprakshkumar@gmail.com",
-      password: "123",
-      age: 27,
-      gender: "male",
-    });
+    const userToCreate = req.body;
+    const user = new User(userToCreate);
     const newUser = await user.save();
     console.log(newUser);
     res.send("New User is Created!");
