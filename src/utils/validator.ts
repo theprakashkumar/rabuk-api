@@ -14,3 +14,13 @@ export const validateSignUp = (req: Request) => {
     throw new Error("Password must be at least 8 characters long!");
   }
 };
+
+export const validateLogin = (req: Request) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new Error("All fields are required!");
+  } else if (!isEmail(email)) {
+    throw new Error("Invalid email!");
+  }
+};
