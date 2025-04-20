@@ -3,8 +3,13 @@ import { Schema, model } from "mongoose";
 
 const userSchema = new Schema(
   {
-    firstName: { type: String, required: true, minlength: 3, maxlength: 30 },
-    lastName: { type: String, required: true, minlength: 3, maxlength: 30 },
+    firstName: {
+      type: String,
+      required: [true, "First name is required"],
+      minLength: [3, "First name must be at least 3 characters"],
+      maxLength: [30, "First name cannot exceed 30 characters"],
+    },
+    lastName: { type: String, minLength: 3, maxLength: 30 },
     email: { type: String, required: true, unique: true },
     password: {
       type: String,
@@ -15,7 +20,7 @@ const userSchema = new Schema(
         }
       },
     },
-    age: { type: Number, required: true, min: 18, max: 2300 },
+    age: { type: Number, required: true, min: 18, max: 200 },
     gender: { type: String, required: true, enum: ["male", "female", "other"] },
     skills: {
       type: [String],
