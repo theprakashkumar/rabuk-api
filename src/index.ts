@@ -3,6 +3,7 @@ import { connectDB } from "./config/database";
 import dotenv from "dotenv";
 import { User } from "./models/user";
 import { validateSignUp } from "./utils/validator";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 const app: Express = express();
@@ -13,10 +14,18 @@ app.use(express.json());
 
 app.post("/signup", async (req: Request, res: Response) => {
   try {
+    const { firstName, lastName, email, password } = req.body;
     validateSignUp(req);
-    const userToCreate = req.body;
     // hash the password
-    const user = new User(userToCreate);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userToCreate = {
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+    };
+
+    const user = new User({ ...userToCreate });
     const newUser = await user.save();
     res.status(201).send(newUser);
   } catch (error: any) {

@@ -20,8 +20,8 @@ const userSchema = new Schema(
         }
       },
     },
-    age: { type: Number, required: true, min: 18, max: 200 },
-    gender: { type: String, required: true, enum: ["male", "female", "other"] },
+    age: { type: Number, min: 18, max: 200 },
+    gender: { type: String, enum: ["male", "female", "other"] },
     skills: {
       type: [String],
     },
