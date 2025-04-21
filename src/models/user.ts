@@ -1,7 +1,22 @@
 import { isStrongPassword } from "validator";
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
-const userSchema = new Schema(
+// Define the interface for User document
+export interface IUser extends Document {
+  firstName: string;
+  lastName?: string;
+  email: string;
+  password: string;
+  age?: number;
+  gender?: "male" | "female" | "other";
+  skills?: string[];
+  getJWT(): Promise<string>;
+  verifyPassword(password: string): Promise<boolean>;
+}
+
+const userSchema: Schema = new Schema(
   {
     firstName: {
       type: String,
@@ -29,4 +44,26 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-export const User = model("User", userSchema);
+userSchema.methods.getJWT = async function () {
+  const user = this;
+
+  const token = await jwt.sign(
+    { _id: user._id },
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: "7d",
+    }
+  );
+
+  return token;
+};
+
+userSchema.methods.verifyPassword = async function (password: string) {
+  const user = this;
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  return isPasswordValid;
+};
+
+export const User = model<IUser>("User", userSchema);

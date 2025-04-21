@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { User } from "./models/user";
 import { validateLogin, validateSignUp } from "./utils/validator";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+
 import cookieParser from "cookie-parser";
 import { useAuth } from "./middleware/auth";
 
@@ -47,13 +47,15 @@ app.post("/login", async (req: Request, res: Response) => {
     if (!user) {
       throw new Error("Either email or password is incorrect!");
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.verifyPassword(password);
     if (!isPasswordValid) {
       throw new Error("Either email or password is incorrect!");
     }
     // Save token into cookie
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!);
-    res.cookie("token", token);
+    const token = await user.getJWT();
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
     res.status(200).send("Login successful!");
   } catch (error: any) {
     res.status(400).send(error.message);
