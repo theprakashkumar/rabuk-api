@@ -1,7 +1,6 @@
-import { Request } from "express";
-import { isEmail, isStrongPassword } from "validator";
+const { isEmail, isStrongPassword } = require("validator");
 
-export const validateSignUp = (req: Request) => {
+const validateSignUp = (req) => {
   const { firstName, lastName, email, password } = req.body;
 
   if (!firstName || !lastName || !email || !password) {
@@ -15,7 +14,7 @@ export const validateSignUp = (req: Request) => {
   }
 };
 
-export const validateLogin = (req: Request) => {
+const validateLogin = (req) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -24,3 +23,5 @@ export const validateLogin = (req: Request) => {
     throw new Error("Invalid email!");
   }
 };
+
+module.exports = { validateSignUp, validateLogin };

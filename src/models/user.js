@@ -1,22 +1,9 @@
-import { isStrongPassword } from "validator";
-import { Schema, model, Document } from "mongoose";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+const { isStrongPassword } = require("validator");
+const { Schema, model } = require("mongoose");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
-// Define the interface for User document
-export interface IUser extends Document {
-  firstName: string;
-  lastName?: string;
-  email: string;
-  password: string;
-  age?: number;
-  gender?: "male" | "female" | "other";
-  skills?: string[];
-  getJWT(): Promise<string>;
-  verifyPassword(password: string): Promise<boolean>;
-}
-
-const userSchema: Schema = new Schema(
+const userSchema = new Schema(
   {
     firstName: {
       type: String,
@@ -29,7 +16,7 @@ const userSchema: Schema = new Schema(
     password: {
       type: String,
       required: true,
-      validate(value: string) {
+      validate(value) {
         if (!isStrongPassword(value)) {
           throw new Error("Password is not strong");
         }
@@ -47,18 +34,14 @@ const userSchema: Schema = new Schema(
 userSchema.methods.getJWT = async function () {
   const user = this;
 
-  const token = await jwt.sign(
-    { _id: user._id },
-    process.env.JWT_SECRET as string,
-    {
-      expiresIn: "7d",
-    }
-  );
+  const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
 
   return token;
 };
 
-userSchema.methods.verifyPassword = async function (password: string) {
+userSchema.methods.verifyPassword = async function (password) {
   const user = this;
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -66,4 +49,6 @@ userSchema.methods.verifyPassword = async function (password: string) {
   return isPasswordValid;
 };
 
-export const User = model<IUser>("User", userSchema);
+const User = model("User", userSchema);
+
+module.exports = { User };

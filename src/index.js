@@ -1,15 +1,14 @@
-import express, { Express, Request, Response } from "express";
-import { connectDB } from "./config/database";
-import dotenv from "dotenv";
-import { User } from "./models/user";
-import { validateLogin, validateSignUp } from "./utils/validator";
-import bcrypt from "bcrypt";
-
-import cookieParser from "cookie-parser";
-import { useAuth } from "./middleware/auth";
+const express = require("express");
+const { connectDB } = require("./config/database");
+const dotenv = require("dotenv");
+const { User } = require("./models/user");
+const { validateLogin, validateSignUp } = require("./utils/validator");
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const { useAuth } = require("./middleware/auth");
 
 dotenv.config();
-const app: Express = express();
+const app = express();
 const port = process.env.PORT || 3001;
 
 // Middleware to parse JSON bodies in the request
@@ -17,7 +16,7 @@ app.use(express.json());
 // Middleware to parse cookies in the request
 app.use(cookieParser());
 
-app.post("/signup", async (req: Request, res: Response) => {
+app.post("/signup", async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
     validateSignUp(req);
@@ -33,12 +32,12 @@ app.post("/signup", async (req: Request, res: Response) => {
     const user = new User({ ...userToCreate });
     const newUser = await user.save();
     res.status(201).send(newUser);
-  } catch (error: any) {
+  } catch (error) {
     res.status(400).send(error.message);
   }
 });
 
-app.post("/login", async (req: Request, res: Response) => {
+app.post("/login", async (req, res) => {
   try {
     validateLogin(req);
     const { email, password } = req.body;
@@ -57,19 +56,20 @@ app.post("/login", async (req: Request, res: Response) => {
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
     res.status(200).send("Login successful!");
-  } catch (error: any) {
+  } catch (error) {
     res.status(400).send(error.message);
   }
 });
 
-app.get("/profile", useAuth, async (req: Request, res: Response) => {
+app.get("/profile", useAuth, async (req, res) => {
   try {
-    const user = (req as any).user;
+    const user = req.user;
     res.status(200).send(user);
-  } catch (error: any) {
+  } catch (error) {
     res.status(400).send(error.message);
   }
 });
+
 const startServer = async () => {
   try {
     // Connect to DB and then start the server.
