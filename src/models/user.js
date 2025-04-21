@@ -24,6 +24,7 @@ const userSchema = new Schema(
     },
     age: { type: Number, min: 18, max: 200 },
     gender: { type: String, enum: ["male", "female", "other"] },
+    photoUrl: { type: String },
     skills: {
       type: [String],
     },
