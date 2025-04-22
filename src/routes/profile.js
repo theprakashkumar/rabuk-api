@@ -1,18 +1,18 @@
 const express = require("express");
-const { useAuth } = require("../middleware/auth");
+const { userAuth } = require("../middlewares/auth");
 const { validateEditProfile } = require("../utils/validator");
 const profileRouter = express.Router();
 
-profileRouter.get("/profile/view", useAuth, async (req, res) => {
+profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
     const user = req.user;
     res.status(200).json({ message: "Profile fetched successfully", user });
   } catch (error) {
-    res.status(400).jsonp({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 });
 
-profileRouter.patch("/profile/edit", useAuth, async (req, res) => {
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
     const isAllowed = validateEditProfile(req);
     if (!isAllowed) {

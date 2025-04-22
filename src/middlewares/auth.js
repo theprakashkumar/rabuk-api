@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models/user");
 
-const useAuth = async (req, res, next) => {
+const userAuth = async (req, res, next) => {
   try {
     // Extract token from cookie
     const token = req.cookies.token;
@@ -10,9 +10,7 @@ const useAuth = async (req, res, next) => {
     }
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
     const user = await User.findById(decoded._id);
-    console.log(user);
     if (!user) {
       throw new Error("User not found!");
     }
@@ -23,4 +21,4 @@ const useAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { useAuth };
+module.exports = { userAuth };
